@@ -1,0 +1,19 @@
+<div ng-show="!isAuthorized">
+  <span>Authorize access to Gmail API</span>
+  <!--Button for the user to click to initiate auth sequence -->
+  <button ng-click="authorize()">
+    Authorize
+  </button>
+</div>
+
+<div class="row label-panel">
+  <div class="col-md-4"> 
+    <h3>Labels:</h3>
+    <li ng-repeat="label in labels" ng-click="getMsgsForLabel(label.id)">{{label.name}}</li>
+  </div>
+
+  <div class="col-md-8 msgs-panel">
+    <h3>Messages({{msgCount}}): </h3>
+    <li ng-repeat="m in messages" >{{m.result.snippet}}</li>
+  </div>
+</div>
