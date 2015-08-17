@@ -45,12 +45,13 @@ angular.module('gmailAppApp')
        */
     function handleAuthResult(authResult) {
       if (authResult && !authResult.error) {
-      	console.log('already authorized')
+      	console.log('authorized')
       	$scope.isAuthorized = true;
         loadGmailApi();
       } else {
         console.log('not authorized')
         $scope.isAuthorized = false
+        $scope.$apply();
       }
     }
 
@@ -101,25 +102,25 @@ angular.module('gmailAppApp')
     // }
 
     function getMessages(msgs) {
-    	var count = 0;
-    	var maxCount = msgs.length;
-    	console.log('max count', maxCount)
+    	// var count = 0;
+    	// var maxCount = msgs.length;
+    	// console.log('max count', maxCount)
 
     	$scope.messages.length = 0;
 
     	_.each(msgs, function(msg) {
-    		count = count + 1
+    		//count = count + 1
 
     		gapi.client.gmail.users.messages.get({
 			    'userId': 'me',
 			    'id': msg.id
 			  }).then(function(resp) {
 			  	$scope.messages.push(resp);
-
-			  	if (count === maxCount) {
-			  		console.log('got msgs')
-			  		$scope.$apply()
-			  	};
+			  	$scope.$apply();
+			  	// if (count === maxCount) {
+			  	// 	console.log('got msgs')
+			  	// 	$scope.$apply()
+			  	// };
 			  })
 
     	})
@@ -127,18 +128,11 @@ angular.module('gmailAppApp')
 
 
 
-   //  function getMsgBody(msg) {
+    // function getMsgBody(msg) {
 	  //   var part = msg.parts.filter(function(part) {
 			//   return part.mimeType == 'text/html';
 			// });
-			// //var html = urlSafeBase64Decode(part.body.data);
-			
-			// console.log('part', part)
-			// console.log(part.body)
-			// var html = atob(part.body.data);
-
-			// console.log('html', html)
-			// //return html;
-   //  }
+			// var html = urlSafeBase64Decode(part.body.data);
+    // }
 
   });

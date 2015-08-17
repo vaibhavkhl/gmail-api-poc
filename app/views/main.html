@@ -1,7 +1,7 @@
 <div ng-show="!isAuthorized">
   <span>Authorize access to Gmail API</span>
   <!--Button for the user to click to initiate auth sequence -->
-  <button ng-click="authorize()">
+  <button ng-click="authorize()" class="btn">
     Authorize
   </button>
 </div>
@@ -13,7 +13,7 @@
   </div>
 
   <div class="col-md-8 msgs-panel">
-    <h3>Messages({{msgCount}}): </h3>
+    <h3>Messages({{msgCount}}) Snippets: </h3>
     <li ng-repeat="m in messages" >{{m.result.snippet}}</li>
   </div>
 </div>
