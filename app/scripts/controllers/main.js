@@ -79,7 +79,7 @@ angular.module('gmailAppApp')
             })
         }
 
-        $scope.searchMsg = function() {
+        $scope.searchMsg = function () {
             var q = getQueryParam();
 
             var request = gapi.client.gmail.users.messages.list({
@@ -87,7 +87,7 @@ angular.module('gmailAppApp')
                 'q': q
             });
 
-            request.then(function(resp) {
+            request.then(function (resp) {
                 getMessages(resp.result.messages)
             })
         };
@@ -139,7 +139,7 @@ angular.module('gmailAppApp')
 
             $scope.messages.length = 0;
 
-            _.each(msgs.slice(0,9), function (msg) {
+            _.each(msgs.slice(0, 9), function (msg) {
                 //count = count + 1
 
                 gapi.client.gmail.users.messages.get({
@@ -164,21 +164,54 @@ angular.module('gmailAppApp')
             m.from = extractField(resp.result, 'FROM');
             m.subject = extractField(resp.result, 'SUBJECT');
             m.date = extractField(resp.result, 'DATE');
+            m.id = resp.result.id;
             //m.text = getText(resp.result.payload)
+            getAttachment(resp.result);
 
             $scope.messages.push(m);
             $scope.$apply();
         }
 
-        function getText(payload) {
-            console.log(payload);
-            var part = payload.parts.filter(function (part) {
-                return part.mimeType == 'text/html';
-            });
-            console.log('part', part);
-            var html = atob(part.body.data.replace(/-/g, '+').replace(/_/g, '/'));
-            console.log('msg html', html);
-            return html
+        function getAttachment(msg) {
+            var parts = msg.payload.parts;
+
+            _.each(parts, function (part) {
+
+                if (part.filename && part.filename.length > 0) {
+                    var attachId = part.body.attachmentId;
+                    var request = gapi.client.gmail.users.messages.attachments.get({
+                        'id': attachId,
+                        'messageId': msg.id,
+                        'userId': 'me'
+                    });
+
+                    request.then(function (resp) {
+                        addAttachment(msg.id, part.filename);
+                        console.log('attachement', resp)
+                    })
+                }
+
+            })
         }
+
+        function addAttachment(mid, filename) {
+            _.each($scope.messages, function (m) {
+                if (m.id == mid) {
+                    m.attachmentName = filename;
+                    $scope.$apply();
+                }
+            })
+        }
+
+        //function getText(payload) {
+        //    console.log(payload);
+        //    var part = payload.parts.filter(function (part) {
+        //        return part.mimeType == 'text/html';
+        //    });
+        //    console.log('part', part);
+        //    var html = atob(part.body.data.replace(/-/g, '+').replace(/_/g, '/'));
+        //    console.log('msg html', html);
+        //    return html
+        //}
 
     });
