@@ -8,7 +8,7 @@
  * Controller of the gmailAppApp
  */
 angular.module('gmailAppApp')
-    .controller('MainCtrl', function ($scope, $q) {
+    .controller('MainCtrl', function ($scope, $filter) {
         // Your Client ID can be retrieved from your project in the Google
         // Developer Console, https://console.developers.google.com
         var CLIENT_ID = '1042316795013-09puaanar8ickpkeq1cnlnp7m3il9p16.apps.googleusercontent.com';
@@ -79,6 +79,40 @@ angular.module('gmailAppApp')
             })
         }
 
+        $scope.searchMsg = function() {
+            var q = getQueryParam();
+
+            var request = gapi.client.gmail.users.messages.list({
+                'userId': 'me',
+                'q': q
+            });
+
+            request.then(function(resp) {
+                getMessages(resp.result.messages)
+            })
+        };
+
+        function getQueryParam() {
+            if ($scope.param.start_date) {
+                var after = 'after:' + $filter('date')($scope.param.start_date, 'yyyy/MM/dd');
+            }
+
+            if ($scope.param.end_date) {
+                var before = 'before:' + $filter('date')($scope.param.end_date, 'yyyy/MM/dd');
+            }
+
+            if ($scope.param.from) {
+                var from = 'from:' + $scope.param.from;
+            }
+
+            if (from) {
+                var q = after + before + from;
+            } else {
+                var q = after + before;
+            }
+            return encodeURI(q.toString());
+        }
+
         $scope.getMsgsForLabel = function (labelId) {
             var request = gapi.client.gmail.users.messages.list({
                 'userId': 'me',
@@ -86,7 +120,7 @@ angular.module('gmailAppApp')
             });
 
             request.execute(function (resp) {
-                $scope.msgCount = resp.resultSizeEstimate;
+                //$scope.msgCount = resp.resultSizeEstimate;
                 getMessages(resp.messages)
             })
         };
@@ -105,7 +139,7 @@ angular.module('gmailAppApp')
 
             $scope.messages.length = 0;
 
-            _.each(msgs, function (msg) {
+            _.each(msgs.slice(0,9), function (msg) {
                 //count = count + 1
 
                 gapi.client.gmail.users.messages.get({
@@ -121,15 +155,15 @@ angular.module('gmailAppApp')
         var extractField = function (resp_result, fieldName) {
             var field = _.find(resp_result.payload.headers, function (header) {
                 return header.name.toLowerCase() === fieldName.toLowerCase();
-            })
+            });
             return field.value
         };
 
         function buildMsg(resp) {
             var m = {};
-            m.from = extractField(resp.result, 'FROM')
-            m.subject = extractField(resp.result, 'SUBJECT')
-            m.date = extractField(resp.result, 'DATE')
+            m.from = extractField(resp.result, 'FROM');
+            m.subject = extractField(resp.result, 'SUBJECT');
+            m.date = extractField(resp.result, 'DATE');
             //m.text = getText(resp.result.payload)
 
             $scope.messages.push(m);
@@ -137,13 +171,13 @@ angular.module('gmailAppApp')
         }
 
         function getText(payload) {
-            console.log(payload)
+            console.log(payload);
             var part = payload.parts.filter(function (part) {
                 return part.mimeType == 'text/html';
             });
-            console.log('part', part)
+            console.log('part', part);
             var html = atob(part.body.data.replace(/-/g, '+').replace(/_/g, '/'));
-            console.log('msg html', html)
+            console.log('msg html', html);
             return html
         }
 
