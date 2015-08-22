@@ -6,14 +6,38 @@
   </button>
 </div>
 
-<div class="row label-panel">
-  <div class="col-md-4"> 
-    <h3>Labels:</h3>
-    <li ng-repeat="label in labels" ng-click="getMsgsForLabel(label.id)">{{label.name}}</li>
-  </div>
+<div class="row search panel-body">
+  <h3>Search</h3>
+  Start Date: <input type="date" ng-model="param.start_date">
+  End Date: <input type="date" ng-model="param.end_date">
+  <button class="btn" type="submit" ng-click="searchMsg()">Search</button>
+</div>
 
-  <div class="col-md-8 msgs-panel">
-    <h3>Messages({{msgCount}}) Snippets: </h3>
-    <li ng-repeat="m in messages" >{{m.result.snippet}}</li>
+<div>
+  <div class="row label-panel">
+    <div class="col-md-3">
+      <h3>Labels:</h3>
+      <div ng-repeat="label in labels" ng-click="getMsgsForLabel(label.id)">{{label.name.toUpperCase()}}</div>
+    </div>
+
+    <div class="col-md-8 msgs-panel">
+      <h3>Messages </h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <td>From</td>
+            <td>Subject</td>
+            <td>Date</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="msg in messages">
+            <td>{{msg.from}}</td>
+            <td>{{msg.subject}}</td>
+            <td>{{msg.date}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
